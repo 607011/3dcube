@@ -22,7 +22,10 @@ done
 
 for JSFILE in cube.js
 do
-    uglifyjs --compress --mangle < src/$JSFILE > deploy/$JSFILE
+    # uglifyjs --compress --mangle < src/$JSFILE > deploy/$JSFILE
+    javascript-obfuscator src/$JSFILE \
+        --debug-protection true \
+        --output deploy/$JSFILE
 done
 
 rsync -rav --delete deploy/* $REMOTE
