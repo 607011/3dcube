@@ -21,7 +21,7 @@
                 [1, -1, 2],
                 [2, -1, 2],
             ],
-            rotation: {
+            r: {
                 fields: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 30, 29, 28, 43, 44, 45],
                 swaps: [3, 6, 9, 2, 5, 8, 1, 4, 7, 19, 20, 21, 30, 29, 28, 43, 44, 45, 10, 11, 12],
                 cover: {
@@ -31,7 +31,7 @@
                     t: [0, 0, -2],
                 },
                 axis: 'Y',
-                degrees: -90,
+                to: -90,
             },
         },
         'l': {
@@ -50,7 +50,7 @@
                 [0, 0.5, 0.5],
                 [1, 0.5, 0.5],
             ],
-            rotation: {
+            r: {
                 fields: [10, 11, 12, 13, 14, 15, 16, 17, 18, 1, 4, 7, 19, 22, 25, 46, 49, 52, 39, 42, 45],
                 swaps: [16, 13, 10, 17, 14, 11, 18, 15, 12, 45, 42, 39, 7, 4, 1, 19, 22, 25, 46, 49, 52],
                 cover: {
@@ -60,7 +60,7 @@
                     t: [0, -1.5, -0.5],
                 },
                 axis: 'X',
-                degrees: -90
+                to: -90
             },
         },
         'f': {
@@ -79,7 +79,7 @@
                 [1, 0.5, 1.5],
                 [2, 0.5, 1.5],
             ],
-            rotation: {
+            r: {
                 fields: [19, 20, 21, 22, 23, 24, 25, 26, 27, 1, 2, 3, 30, 33, 36, 46, 47, 48, 12, 15, 18],
                 swaps: [25, 22, 19, 26, 23, 20, 27, 24, 21, 18, 15, 12, 1, 2, 3, 36, 33, 30, 46, 47, 48],
                 cover: {
@@ -89,7 +89,7 @@
                     t: [0, -1.5, 0.5],
                 },
                 axis: 'Z',
-                degrees: 90
+                to: 90
             },
         },
         'r': {
@@ -108,7 +108,7 @@
                 [0, 0.5, 2.5],
                 [-1, 0.5, 2.5],
             ],
-            rotation: {
+            r: {
                 fields: [28, 29, 30, 31, 32, 33, 34, 35, 36, 3, 6, 9, 21, 24, 27, 48, 51, 54, 37, 40, 43],
                 swaps: [30, 33, 36, 29, 32, 35, 28, 31, 34, 27, 24, 21, 48, 51, 54, 37, 40, 43, 9, 6, 3],
                 cover: {
@@ -118,7 +118,7 @@
                     t: [0, -1.5, 0.5]
                 },
                 axis: 'X',
-                degrees: 90
+                to: 90
             },
         },
         'b': {
@@ -137,7 +137,7 @@
                 [0, 1.5, 1.5],
             ],
             color: 5,
-            rotation: {
+            r: {
                 fields: [37, 38, 39, 40, 41, 42, 43, 44, 45, 10, 13, 16, 52, 53, 54, 34, 31, 28, 9, 8, 7],
                 swaps: [39, 42, 45, 38, 41, 44, 37, 40, 43, 9, 8, 7, 10, 13, 16, 52, 53, 54, 34, 31, 28],
                 cover: {
@@ -147,7 +147,7 @@
                     t: [0, -1.5, -0.5],
                 },
                 axis: 'Z',
-                degrees: -90
+                to: -90
             },
         },
         'd': {
@@ -166,7 +166,7 @@
                 [1, 1, 1],
                 [2, 1, 1],
             ],
-            rotation: {
+            r: {
                 fields: [46, 47, 48, 49, 50, 51, 52, 53, 54, 25, 26, 27, 16, 17, 18, 37, 38, 39, 36, 35, 34],
                 swaps: [52, 49, 46, 53, 50, 47, 54, 51, 48, 16, 17, 18, 37, 38, 39, 36, 35, 34, 25, 26, 27],
                 cover: {
@@ -176,13 +176,13 @@
                     t: [0, 0, -1]
                 },
                 axis: 'Y',
-                degrees: 90
+                to: 90
             },
         },
     };
     let el = {};
     let t0 = window.performance.now();
-    let rot0, rot1, rotAxis;
+    let rot1, rotAxis, ccw = false;
     let currentFace;
     let mouseDown = false;
     let mouseX0, mouseY0;
@@ -191,29 +191,33 @@
     let fields = [];
     let playing = false;
     let seqIdx = 0;
+    let sequence = [];
     let animationRunning = false;
     function addCover(face) {
         const div = document.createElement('div');
-        div.className = `cover cover${FACES[face].rotation.cover.idx}`;
+        div.className = `cover cover${FACES[face].r.cover.idx}`;
         el.fields.appendChild(div);
         el.rotLayer.appendChild(div.cloneNode());
     }
     function toggle(face) {
-        for (const idx of FACES[face].rotation.fields) {
+        for (const idx of FACES[face].r.fields) {
             fields[idx].classList.toggle('hidden');
         }
     }
     function addRotatingFaces(face) {
         let faces = [];
-        for (const idx of FACES[face].rotation.fields) {
+        for (const idx of FACES[face].r.fields) {
             faces.push(fields[idx].cloneNode(true));
         }
         el.rotLayer.replaceChildren(...faces)
     }
-    function rotate(face) {
+    function turn(face, counterclockwise) {
+        ccw = counterclockwise;
         currentFace = face;
-        rot1 = FACES[face].rotation.degrees;
-        rotAxis = FACES[face].rotation.axis;
+        rot1 = ccw
+            ? -FACES[face].r.to
+            : FACES[face].r.to;
+        rotAxis = FACES[face].r.axis;
         el.rotLayer.style.transform = `rotate${rotAxis}(0deg)`;
         addRotatingFaces(face);
         toggle(face);
@@ -223,7 +227,7 @@
         window.requestAnimationFrame(animate);
     }
     function transferFields(face) {
-        const r = FACES[face].rotation;
+        const r = FACES[face].r;
         let src = { colors: {}, labels: {} };
         // backup values so we can copy them in one go
         for (let i = 0; i < r.fields.length; ++i) {
@@ -231,8 +235,14 @@
             src.labels[r.fields[i]] = fields[r.fields[i]].firstChild.textContent;
         }
         for (let i = 0; i < r.fields.length; ++i) {
-            fields[r.fields[i]].setAttribute('data-color', src.colors[r.swaps[i]]);
-            fields[r.fields[i]].firstChild.textContent = src.labels[r.swaps[i]];
+            if (ccw) {
+                fields[r.swaps[i]].setAttribute('data-color', src.colors[r.fields[i]]);
+                fields[r.swaps[i]].firstChild.textContent = src.labels[r.fields[i]];
+            }
+            else {
+                fields[r.fields[i]].setAttribute('data-color', src.colors[r.swaps[i]]);
+                fields[r.fields[i]].firstChild.textContent = src.labels[r.swaps[i]];
+            }
         }
     }
     function animate() {
@@ -280,40 +290,78 @@
     function onKeyPress(e) {
         if (animationRunning)
             return;
-        if (Object.keys(FACES).includes(e.key)) {
-            rotate(e.key);
+        if (e.target === el.sequence) {
+            return;
         }
-    }
-    function startSequence() {
-        playing = true;
-        seqIdx = 0;
-        el.playButton.textContent = '⏸️';
-        playNextTurn();
-    }
-    function stopSequence() {
-        playing = false;
-        el.playButton.textContent = '▶️';
+        const key = e.key.toLowerCase();
+        if (Object.keys(FACES).includes(key)) {
+            turn(key, e.shiftKey);
+        }
     }
     function playNextTurn() {
         if (!playing)
             return;
-        if (seqIdx >= el.sequence.value.length) {
-            stopSequence();
+        if (seqIdx >= sequence.length) {
+            pauseSequence();
             return;
         }
-        rotate(el.sequence.value[seqIdx++].toLowerCase());
+        const key = sequence[seqIdx++];
+        turn(key.toLowerCase(), (key === key.toUpperCase()));
+    }
+    function resumeSequence() {
+        playing = true;
+        el.playButton.textContent = '⏸️';
+        playNextTurn();
+    }
+    function startSequence() {
+        sequence = [];
+        let i = 0;
+        while (i < el.sequence.value.length) {
+            const key = el.sequence.value[i].toLowerCase();
+            if (!Object.keys(FACES).includes(key)) {
+                ++i;
+                continue;
+            }
+            if (el.sequence.value[i + 1] === "'") {
+                sequence.push(key.toUpperCase());
+                i += 2;
+            }
+            else if (el.sequence.value[i + 1] === "2") {
+                sequence.push(key);
+                sequence.push(key);
+                i += 2;
+            }
+            else {
+                sequence.push(key);
+                ++i
+            }
+        }
+        seqIdx = 0;
+        resumeSequence();
+    }
+    function pauseSequence() {
+        playing = false;
+        el.playButton.textContent = '▶️';
     }
     function playPause() {
         if (playing) {
-            stopSequence();
+            pauseSequence();
         }
         else {
-            startSequence();
+            if (seqIdx >= sequence.length) {
+                generateFields();
+                startSequence();
+            }
+            else if (seqIdx > 0) {
+                resumeSequence();
+            }
+            else {
+                startSequence();
+            }
         }
     }
     function generateStyles() {
         const style = document.createElement('style');
-        style.type = 'text/css';
         let styles = `
 #cube-container {
     margin: ${3 * SCALE}px auto 0;
@@ -348,7 +396,7 @@
     background-color: #080808;
 }`;
         for (const [face, d] of Object.entries(FACES)) {
-            const cover = d.rotation.cover;
+            const cover = d.r.cover;
             const tX = SCALE * cover.t[0];
             const tY = SCALE * cover.t[1];
             const tZ = SCALE * cover.t[2];
@@ -404,8 +452,8 @@
         el.sequence = document.querySelector('#sequence');
         el.playButton = document.querySelector('#play-button');
         el.playButton.addEventListener('click', playPause);
+        window.addEventListener('keypress', onKeyPress);
     }
     window.addEventListener('load', main);
-    window.addEventListener('keypress', onKeyPress);
 })(window);
 
