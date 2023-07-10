@@ -18,13 +18,24 @@
             color: #eee;
         }
 
-        #controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+        #cube-container {
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            cursor: pointer;
         }
 
-        #controls+input {
+        #controls {
+            margin: 10px auto;
+            padding: 5px;
+        }
+
+        #controls>div {
+            text-align: center;
+            width: auto;
+        }
+
+        #controls input {
             font-size: 22px;
         }
 
@@ -38,14 +49,25 @@
 
         #rot-layer {
             transform-style: preserve-3d;
-            -moz-transform-style: preserve-3d;
             -webkit-transform-style: preserve-3d;
+            -moz-transform-style: preserve-3d;
         }
 
         #fields {
             transform-style: preserve-3d;
-            -moz-transform-style: preserve-3d;
             -webkit-transform-style: preserve-3d;
+            -moz-transform-style: preserve-3d;
+        }
+
+        .field>span {
+            display: inline-block;
+            visibility: visible;
+            color: #111;
+            width: 100%;
+            height: 50%;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
         }
 
         .field.hidden {
@@ -53,7 +75,7 @@
         }
 
         .field[data-color="1"] {
-            background-color: #ffffff
+            background-color: #f8f8f8;
         }
 
         .field[data-color="2"] {
@@ -65,11 +87,11 @@
         }
 
         .field[data-color="4"] {
-            background-color: #cc1111
+            background-color: #DF2323
         }
 
         .field[data-color="5"] {
-            background-color: #2222ee
+            background-color: #5454DF
         }
 
         .field[data-color="6"] {
@@ -79,30 +101,31 @@
 
     <script>
         (function (window) {
-            const ANIMATION_DURATION = 444;
-            const DEFAULT_ROT_X = 35;
-            const DEFAULT_ROT_Y = -35;
+            "use strict";
+            const ANIMATION_DURATION = 500;
+            const DEFAULT_ROT_X = -140;
+            const DEFAULT_ROT_Y = -40;
             const SCALE = 100;
             const FACES = {
                 'u': {
                     fields: [1, 2, 3, 4, 5, 6, 7, 8, 9],
                     color: 1,
-                    rX: -90,
+                    rX: 90,
                     rY: 0,
                     t: [
-                        [0, 1, -2],
-                        [1, 1, -2],
-                        [2, 1, -2],
-                        [0, 0, -2],
-                        [1, 0, -2],
-                        [2, 0, -2],
-                        [0, -1, -2],
-                        [1, -1, -2],
-                        [2, -1, -2],
+                        [0, 1, 2],
+                        [1, 1, 2],
+                        [2, 1, 2],
+                        [0, 0, 2],
+                        [1, 0, 2],
+                        [2, 0, 2],
+                        [0, -1, 2],
+                        [1, -1, 2],
+                        [2, -1, 2],
                     ],
                     rotation: {
-                        fields: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 28, 29, 30, 37, 38, 39],
-                        swaps: [7, 4, 1, 8, 5, 2, 1, 4, 7, 19, 20, 21, 28, 29, 30, 37, 38, 39, 10, 11, 12],
+                        fields: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 19, 20, 21, 30, 29, 28, 43, 44, 45],
+                        swaps: [3, 6, 9, 2, 5, 8, 1, 4, 7, 19, 20, 21, 30, 29, 28, 43, 44, 45, 10, 11, 12],
                         cover: {
                             idx: 1,
                             rX: -90,
@@ -130,8 +153,8 @@
                         [1, 0.5, 0.5],
                     ],
                     rotation: {
-                        fields: [10, 11, 12, 13, 14, 15, 16, 17, 18, 1, 4, 7, 19, 22, 25, 46, 49, 52, 39, 42, 45],
-                        swaps: [16, 13, 10, 17, 14, 11, 18, 15, 12, 45, 42, 39, 1, 4, 7, 19, 22, 25, 52, 49, 46],
+                        fields: [10, 11, 12, 13, 14, 15, 16, 17, 18,  1,  4,  7, 19, 22, 25, 46, 49, 52, 39, 42, 45],
+                        swaps:  [16, 13, 10, 17, 14, 11, 18, 15, 12, 45, 42, 39,  7,  4,  1, 19, 22, 25, 46, 49, 52],
                         cover: {
                             idx: 2,
                             rX: 0,
@@ -159,8 +182,8 @@
                         [2, 0.5, 1.5],
                     ],
                     rotation: {
-                        fields: [19, 20, 21, 22, 23, 24, 25, 26, 27, 7, 8, 9, 12, 15, 18, 46, 47, 48, 28, 31, 34],
-                        swaps: [25, 22, 19, 26, 23, 20, 27, 24, 21, 18, 15, 12, 46, 47, 48, 34, 31, 28, 7, 8, 9],
+                        fields: [19, 20, 21, 22, 23, 24, 25, 26, 27,  1,  2,  3, 30, 33, 36, 46, 47, 48, 12, 15, 18],
+                        swaps:  [25, 22, 19, 26, 23, 20, 27, 24, 21, 18, 15, 12,  1,  2,  3, 36, 33, 30, 46, 47, 48],
                         cover: {
                             idx: 3,
                             rX: 0,
@@ -175,21 +198,21 @@
                     fields: [28, 29, 30, 31, 32, 33, 34, 35, 36],
                     color: 4,
                     rX: 0,
-                    rY: -90,
+                    rY: 90,
                     t: [
-                        [1, -1.5, -2.5],
-                        [0, -1.5, -2.5],
-                        [-1, -1.5, -2.5],
-                        [1, -0.5, -2.5],
-                        [0, -0.5, -2.5],
-                        [-1, -0.5, -2.5],
-                        [1, 0.5, -2.5],
-                        [0, 0.5, -2.5],
-                        [-1, 0.5, -2.5],
+                        [1, -1.5, 2.5],
+                        [0, -1.5, 2.5],
+                        [-1, -1.5, 2.5],
+                        [1, -0.5, 2.5],
+                        [0, -0.5, 2.5],
+                        [-1, -0.5, 2.5],
+                        [1, 0.5, 2.5],
+                        [0, 0.5, 2.5],
+                        [-1, 0.5, 2.5],
                     ],
                     rotation: {
-                        fields: [28, 29, 30, 31, 32, 33, 34, 35, 36, 3, 6, 9, 21, 24, 27, 48, 51, 54, 37, 40, 43],
-                        swaps: [34, 31, 28, 35, 32, 29, 28, 33, 30, 21, 24, 27, 48, 51, 54, 37, 40, 43, 3, 6, 9],
+                        fields: [28, 29, 30, 31, 32, 33, 34, 35, 36,  3,  6,  9, 21, 24, 27, 48, 51, 54, 37, 40, 43],
+                        swaps:  [30, 33, 36, 29, 32, 35, 28, 31, 34, 27, 24, 21, 48, 51, 54, 37, 40, 43,  9,  6,  3],
                         cover: {
                             idx: 4,
                             rX: 0,
@@ -202,23 +225,23 @@
                 },
                 'b': {
                     fields: [37, 38, 39, 40, 41, 42, 43, 44, 45],
-                    rX: 0,
+                    rX: 180,
                     rY: 0,
                     t: [
-                        [2, -1.5, -1.5],
-                        [1, -1.5, -1.5],
-                        [0, -1.5, -1.5],
-                        [2, -0.5, -1.5],
-                        [1, -0.5, -1.5],
-                        [0, -0.5, -1.5],
-                        [2, 0.5, -1.5],
-                        [1, 0.5, -1.5],
-                        [0, 0.5, -1.5],
+                        [2, -0.5, 1.5],
+                        [1, -0.5, 1.5],
+                        [0, -0.5, 1.5],
+                        [2, 0.5, 1.5],
+                        [1, 0.5, 1.5],
+                        [0, 0.5, 1.5],
+                        [2, 1.5, 1.5],
+                        [1, 1.5, 1.5],
+                        [0, 1.5, 1.5],
                     ],
                     color: 5,
                     rotation: {
-                        fields: [37, 38, 39, 40, 41, 42, 43, 44, 45, 30, 33, 36, 10, 13, 16, 1, 2, 3, 52, 53, 54],
-                        swaps: [43, 40, 37, 44, 41, 38, 45, 42, 39, 54, 53, 52, 3, 2, 1, 30, 33, 36, 10, 13, 16],
+                        fields: [37, 38, 39, 40, 41, 42, 43, 44, 45, 10, 13, 16, 52, 53, 54, 34, 31, 28,  9,  8,  7],
+                        swaps:  [39, 42, 45, 38, 41, 44, 37, 40, 43,  9,  8,  7, 10, 13, 16, 52, 53, 54, 34, 31, 28],
                         cover: {
                             idx: 5,
                             rX: 0,
@@ -246,8 +269,8 @@
                         [2, 1, 1],
                     ],
                     rotation: {
-                        fields: [46, 47, 48, 49, 50, 51, 52, 53, 54, 25, 26, 27, 16, 17, 18, 34, 35, 36, 43, 44, 45],
-                        swaps: [52, 49, 46, 53, 50, 47, 54, 51, 48, 16, 17, 18, 43, 44, 45, 25, 26, 27, 34, 35, 36],
+                        fields: [46, 47, 48, 49, 50, 51, 52, 53, 54, 25, 26, 27, 16, 17, 18, 37, 38, 39, 36, 35, 34],
+                        swaps:  [52, 49, 46, 53, 50, 47, 54, 51, 48, 16, 17, 18, 37, 38, 39, 36, 35, 34, 25, 26, 27],
                         cover: {
                             idx: 6,
                             rX: -90,
@@ -268,6 +291,8 @@
             let rotX = DEFAULT_ROT_X;
             let rotY = DEFAULT_ROT_Y;
             let fields = [];
+            let playing = false;
+            let seqIdx = 0;
             let animationRunning = false;
             function addCover(face) {
                 const div = document.createElement('div');
@@ -302,6 +327,7 @@
             function transferFields(face) {
                 const r = FACES[face].rotation;
                 let src = { colors: {}, labels: {} };
+                // backup values so we can copy them in one go
                 for (let i = 0; i < r.fields.length; ++i) {
                     src.colors[r.fields[i]] = fields[r.fields[i]].getAttribute('data-color');
                     src.labels[r.fields[i]] = fields[r.fields[i]].firstChild.textContent;
@@ -319,6 +345,9 @@
                     toggle(currentFace);
                     transferFields(currentFace);
                     animationRunning = false;
+                    if (playing) {
+                        playNextTurn();
+                    }
                 }
                 else {
                     el.rotLayer.style.transform = `rotate${rotAxis}(${rot1 * (dt / ANIMATION_DURATION)}deg)`;
@@ -357,6 +386,29 @@
                     rotate(e.key);
                 }
             }
+            function startSequence() {
+                playing = true;
+                seqIdx = 0;
+                el.playButton.textContent = '⏸️';
+                playNextTurn();
+            }
+            function stopSequence() {
+                playing = false;
+                el.playButton.textContent = '▶️';
+            }
+            function playNextTurn() {
+                if (!playing || seqIdx >= el.sequence.value.length)
+                    return;
+                rotate(el.sequence.value[seqIdx++].toLowerCase());
+            }
+            function playPause() {
+                if (playing) {
+                    stopSequence();
+                }
+                else {
+                    startSequence();
+                }
+            }
             function generateStyles() {
                 const style = document.createElement('style');
                 style.type = 'text/css';
@@ -366,10 +418,8 @@
     perspective: ${9 * SCALE}px;
     width: ${3 * SCALE}px;
     height: ${3 * SCALE}px;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    cursor: pointer;
+    background-color: #484848;
+    box-shadow: 0 0 ${SCALE / 5}px ${SCALE / 5}px #484848;
 }
 #cube {
     position: relative;
@@ -377,23 +427,17 @@
     transform-style: preserve-3d;
     -moz-transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
+    background-color: #999;
 }
-.field, .layer {
+.field {
     position: absolute;
     width: ${SCALE}px;
     height: ${SCALE}px;
     border: ${SCALE / 25}px solid #000;
+
 }
-.field span {
-    display: inline-block;
-    visibility: visible;
-    color: #111;
-    width: 100%;
-    height: 50%;
-    text-align: center;
+.field > span {
     font-size: ${SCALE / 3}px;
-    font-family: 'Courier New', Courier, monospace;
-    font-weight: bold;
 }
 .cover {
     position: absolute;
@@ -455,6 +499,9 @@
                 setRotation(DEFAULT_ROT_X, DEFAULT_ROT_Y);
                 generateStyles();
                 generateFields();
+                el.sequence = document.querySelector('#sequence');
+                el.playButton = document.querySelector('#play-button');
+                el.playButton.addEventListener('click', playPause);
             }
             window.addEventListener('load', main);
             window.addEventListener('keypress', onKeyPress);
@@ -465,8 +512,11 @@
 
 <body>
     <div id="controls">
-        <input type="text" name="sequence" id="sequence" />
-        <span class="button">▶️</span>
+        <div>
+            <input type="text" name="sequence" id="sequence" placeholder="Paste sequence here ..."
+                value="DLULURULDRDLDRLRDLURDLDRUR" />
+            <span class="button" id="play-button">▶️</span>
+        </div>
     </div>
     <div id="cube-container">
         <div id="cube">
