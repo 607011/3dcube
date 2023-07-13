@@ -3,7 +3,7 @@
     const ANIMATION_DURATION = 400;
     const DEFAULT_ROT_X = -37;
     const DEFAULT_ROT_Y = -47;
-    const SCALE = 100;
+    const SCALE = 160;
     const FACES = {
         'u': {
             fields: [1, 2, 3, 4, 5, 6, 7, 8, 9],
