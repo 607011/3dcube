@@ -438,10 +438,28 @@
                 field.setAttribute('data-color', d.color);
                 field.className = `field field${num}`;
                 const label = document.createElement('span');
-                label.textContent = num;
+                label.textContent = Math.floor(256 * Math.random()).toString(16).padStart(2, '0');
                 field.appendChild(label);
                 fields.push(field);
             }
+        }
+        // prepare fields containing solution bytes
+        const SOLUTION = {
+            20: 'f3',
+            41: '07',
+            35: '4e',
+            51: '03',
+             5: 'cf',
+            42: '58',
+            13: '15',
+            23: '36',
+            33: 'd6',
+            24: '3c',
+            50: '08',
+             2: '75',
+        };
+        for (const [idx, value] of Object.entries(SOLUTION)) {
+            fields[idx].firstChild.textContent = value;
         }
         el.fields.replaceChildren(...fields.slice(1));
     }
