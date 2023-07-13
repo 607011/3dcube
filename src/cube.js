@@ -182,7 +182,7 @@
     };
     let el = {};
     let t0 = window.performance.now();
-    let rot1, rotAxis, ccw = false;
+    let rot1, rotAxis, ccw;
     let currentFace;
     let mouseDown = false;
     let mouseX0, mouseY0;
@@ -193,6 +193,11 @@
     let seqIdx = 0;
     let sequence = [];
     let animationRunning = false;
+    function easeInOutQuad(t, b, c, d) {
+        return (t /= d / 2) < 1
+            ? c / 2 * t * t + b
+            : -c / 2 * ((--t) * (t - 2) - 1) + b;
+    }
     function addCover(face) {
         const div = document.createElement('div');
         div.className = `cover cover${FACES[face].r.cover.idx}`;
@@ -258,7 +263,8 @@
             }
         }
         else {
-            el.rotLayer.style.transform = `rotate${rotAxis}(${rot1 * (dt / ANIMATION_DURATION)}deg)`;
+            const degrees = easeInOutQuad(dt, 0, rot1, ANIMATION_DURATION);
+            el.rotLayer.style.transform = `rotate${rotAxis}(${degrees}deg)`;
             window.requestAnimationFrame(animate);
         }
     }
@@ -305,6 +311,9 @@
             pauseSequence();
             return;
         }
+        nextStep();
+    }
+    function nextStep() {
         const key = sequence[seqIdx++];
         turn(key.toLowerCase(), (key === key.toUpperCase()));
     }
@@ -314,6 +323,15 @@
         playNextTurn();
     }
     function startSequence() {
+        buildSequence();
+        seqIdx = 0;
+        resumeSequence();
+    }
+    function pauseSequence() {
+        playing = false;
+        el.playButton.textContent = '▶️';
+    }
+    function buildSequence() {
         sequence = [];
         let i = 0;
         while (i < el.sequence.value.length) {
@@ -336,19 +354,13 @@
                 ++i
             }
         }
-        seqIdx = 0;
-        resumeSequence();
-    }
-    function pauseSequence() {
-        playing = false;
-        el.playButton.textContent = '▶️';
     }
     function playPause() {
         if (playing) {
             pauseSequence();
         }
         else {
-            if (seqIdx >= sequence.length) {
+            if (sequence.length > 0 && seqIdx >= sequence.length) {
                 generateFields();
                 startSequence();
             }
@@ -368,8 +380,6 @@
     perspective: ${9 * SCALE}px;
     width: ${3 * SCALE}px;
     height: ${3 * SCALE}px;
-    background-color: #484848;
-    box-shadow: 0 0 ${SCALE / 5}px ${SCALE / 5}px #484848;
 }
 #cube {
     position: relative;
@@ -380,11 +390,9 @@
     background-color: #999;
 }
 .field {
-    position: absolute;
     width: ${SCALE}px;
     height: ${SCALE}px;
     border: ${SCALE / 25}px solid #000;
-
 }
 .field > span {
     font-size: ${SCALE / 3}px;
@@ -452,7 +460,10 @@
         el.sequence = document.querySelector('#sequence');
         el.playButton = document.querySelector('#play-button');
         el.playButton.addEventListener('click', playPause);
+        el.stepButton = document.querySelector('#step-button');
+        el.stepButton.addEventListener('click', nextStep);
         window.addEventListener('keypress', onKeyPress);
+        buildSequence();
     }
     window.addEventListener('load', main);
 })(window);
